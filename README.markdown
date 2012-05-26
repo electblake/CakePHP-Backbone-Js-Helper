@@ -20,49 +20,52 @@ This was built for my personal projects so if it doesn't meet your needs make is
 
 _[Manual]_
 
-# Download this: http://github.com/dkullmann/CakePHP-Backbone-Js-Helper/zipball/master
-# Unzip that download.
-# Copy the resulting folder to app/plugins
-# Rename the folder you just copied to @[PLUGIN_NAME]@
+* Download this: http://github.com/dkullmann/CakePHP-Backbone-Js-Helper/zipball/master
+* Unzip that download.
+* Copy the resulting folder to app/plugins
+* Rename the folder you just copied to @[PLUGIN_NAME]@
 
 _[GIT Submodule]_
 
 In your app directory type:
-<pre><code>git submodule add git://github.com/dkullmann/CakePHP-Backbone-Js-Helper.git Plugin/Backbone
-git submodule init
-git submodule update
-</code></pre>
+
+	git submodule add git://github.com/dkullmann/CakePHP-Backbone-Js-Helper.git Plugin/Backbone
+	git submodule init
+	git submodule update
 
 _[GIT Clone]_
 
 In your plugin directory type
-<pre><code>git clone git://github.com/dkullmann/CakePHP-Backbone-Js-Helper.git Plugin/Backbone</code></pre>
+
+	git clone git://github.com/dkullmann/CakePHP-Backbone-Js-Helper.git Plugin/Backbone
 
 ## Usage
 
-// Controller
-<pre><code>public $helpers = array('Backbone.Backbone');</pre></code>
+_Controller_
 
-// View
-<pre><code># Files will be added to $scripts_for_layout, not inline
-$this->Backbone->init(
-	array('Model' => 'UserModel'), // Load a single file
-	array('View' => array('UserView', 'UserIndexView')), // Load many files
-);
+	public $helpers = array('Backbone.Backbone');
 
-# Bootstrap a model
-echo $this->Backbone->bootstrap($user, 'User'); // Takes Model::find() results and formats them nicely
-</code></pre>
+_View_
 
-// More complex bootstrap
-<pre><code># Create var customName = { attributes };
-echo $this->Backbone->bootstrap($user, 'User', array('varName' => 'customName'));
+	# Files will be added to $scripts_for_layout, not inline
+	$this->Backbone->init(
+		array('Model' => 'UserModel'), // Load a single file
+		array('View' => array('UserView', 'UserIndexView')), // Load many files
+		);
 
-# Maybe we don't have an alias set in our variable (like CakePHP 2.x $this->Auth->user())
-echo $this->Backbone->bootstrap($user, null, array('varName' => 'User'));
+	# Bootstrap a model
+	echo $this->Backbone->bootstrap($user, 'User'); // Takes Model::find() results and formats them nicely
 
-# Or maybe we want to merge other models we got with $contain in Model::find()
-echo $this->Backbone->bootstrap($user, 'User', array('merge' => 'Profile'));</code><pre>
+_More complex bootstrap_
+
+	# Create var customName = { attributes };
+	echo $this->Backbone->bootstrap($user, 'User', array('varName' => 'customName'));
+	
+	# Maybe we don't have an alias set in our variable (like CakePHP 2.x $this->Auth->user())
+	echo $this->Backbone->bootstrap($user, null, array('varName' => 'User'));
+	
+	# Or maybe we want to merge other models we got with $contain in Model::find()
+	echo $this->Backbone->bootstrap($user, 'User', array('merge' => 'Profile'));
 
 ## Options
 
