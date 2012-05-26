@@ -1,14 +1,14 @@
-h1. CakePHP Backbone Js Plugin
+# CakePHP Backbone Js Plugin
 
 Load Backbone.js files and bootstrap your models with ease.
 
-h2. Background
+## Background
 
 Easily enforce structure with your backbone.js app without having to toil over managing your included javascript. Bootstrap models in the correct backbone.js format with common, helpful options.
 
 This was built for my personal projects so if it doesn't meet your needs make issues or submit patch requests. The API will probably change (improve!) once it's being used on a few more projects.
 
-h2. Requirements
+## Requirements
 
 * PHP >= 5.3 (5.2 could work if you remove visibiltiy from vars and methods)
 * CakePHP 2.x
@@ -16,7 +16,7 @@ h2. Requirements
 * Backbone forms if you want: https://github.com/powmedia/backbone-forms
 * A minimal understanding of helpers, plugins, and backbone.js so you can debug if anything goes wrong.
 
-h2. Installation
+## Installation
 
 _[Manual]_
 
@@ -38,7 +38,7 @@ _[GIT Clone]_
 In your plugin directory type
 <pre><code>git clone git://github.com/dkullmann/CakePHP-Backbone-Js-Helper.git Plugin/Backbone</code></pre>
 
-h2. Usage
+## Usage
 
 // Controller
 <pre><code>public $helpers = array('Backbone.Backbone');</pre></code>
@@ -64,21 +64,21 @@ echo $this->Backbone->bootstrap($user, null, array('varName' => 'User'));
 # Or maybe we want to merge other models we got with $contain in Model::find()
 echo $this->Backbone->bootstrap($user, 'User', array('merge' => 'Profile'));</code><pre>
 
-h2. Options
+## Options
 
-# variable : _default: null_ The PHP view variable to bootstrap
-# alias : _default: null_ The alias of the model you are bootstrapping, or null if there is no model
-# options : _default: array()_ Array of options: 
-## inline : _default: false_ Set to true to echo the javascript inline, otherwise it's added to the pages $scripts_for_layout 
-## varName : _default: false_ Override the default name of the js variable produced. Defaults to the $alias parameter (req'd if $alias is null)
-## merge: _default: false_ Allows you to merge another alias from $variable into the javascript results, useful for hasOne and hasMany type relationships
+* variable : _default: null_ The PHP view variable to bootstrap
+* alias : _default: null_ The alias of the model you are bootstrapping, or null if there is no model
+* options : _default: array()_ Array of options: 
+    * inline : _default: false_ Set to true to echo the javascript inline, otherwise it's added to the pages $scripts_for_layout 
+    * varName : _default: false_ Override the default name of the js variable produced. Defaults to the $alias parameter (req'd if $alias is null)
+    * merge: _default: false_ Allows you to merge another alias from $variable into the javascript results, useful for hasOne and hasMany type relationships
 
-h2. Todo
+## Todo
 
 * Have more people use it and tell me what they want / patch it
 * Potentially make it work nicely with AssetCompress so you aren't loading a zillion files from BackboneHelper::init()
 
-h2. License
+## License
 
 Copyright (c) 2012 David Kullmann
 
@@ -98,4 +98,4 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+THE SOFTWARE.	
