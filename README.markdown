@@ -39,6 +39,14 @@ In your plugin directory type
 
 	git clone git://github.com/dkullmann/CakePHP-Backbone-Js-Helper.git Plugin/Backbone
 
+### Enable plugin
+
+In 2.0 you need to enable the plugin your `app/Config/bootstrap.php` file:
+
+	CakePlugin::load('Backbone');
+
+If you are already using `CakePlugin::loadAll();`, then this is not necessary.
+
 ## Usage
 
 _Controller_
