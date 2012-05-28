@@ -37,6 +37,21 @@ class BackboneHelper extends AppHelper {
  * @var string
  */
 	public $include = array('json2', 'underscore', 'backbone', 'mustache');
+
+/**
+ * "Plugin" like includes located in webroot/js/backbone/<plugin> to include
+ *
+ * @var string
+ */
+	public $plugins = array(
+		'forms' => array(
+			'js' => array('/src/backbone-forms.js'),
+			'css' => array('/src/backbone-forms.css')
+		),
+		'pagination' => array(
+			'js' => array('/backbone.pagedcollection.js')
+		)
+	);
 	
 /**
  * Helpers to use
@@ -64,6 +79,7 @@ class BackboneHelper extends AppHelper {
 		));
 		
 		$this->includeCore(false, $options);
+		$this->includePlugins($options);
 		
 		$this->Html->scriptBlock("var viewVars = $viewVarsJson;", $options);
 		return $this->load($files, $options);
@@ -88,6 +104,39 @@ class BackboneHelper extends AppHelper {
 			}
 			$this->Html->script($core, $options);
 		}
+	}
+	
+	public function includePlugins($options = array()) {
+		$jsFiles = array();
+		$cssFiles = array();
+		foreach ($this->plugins as $plugin => $types) {
+			foreach ($types as $type => $files) {
+				foreach ($files as $file) {
+					$file = $this->filePath($file, compact('type', 'plugin'));
+					if ($type === 'js') {
+						$jsFiles[] = $file;
+					} elseif ($type === 'css') {
+						$cssFiles[] = $file;
+					}
+				}
+			}
+		}
+		$this->Html->script($jsFiles, $options);
+		$this->Html->css($cssFiles, null, $options);
+	}
+
+/**
+ * Locate a file
+ *
+ * @author David Kullmann
+ */
+	public function filePath($file, $options) {
+		extract ($options);
+		$path = 'backbone/';
+		$prefix = (isset($type) && $type = 'css') ? '/js/' : '';
+		$pluginPrefix = $this->usePluginFile ? 'Backbone.' : '';
+		$bbPlugin = (isset($plugin)) ? $plugin : ''; 
+		return $pluginPrefix . $prefix . $path . $bbPlugin . $file;
 	}
 
 /**
@@ -131,6 +180,7 @@ class BackboneHelper extends AppHelper {
 			'inline' => true,
 			'alias' => $alias,
 			'merge' => false,
+			'contain' => false
 		);
 		
 		$options = array_merge($defaults, $options);
@@ -175,16 +225,33 @@ class BackboneHelper extends AppHelper {
 	}
 	
 	protected function _extractModel($model = array(), $alias = null, $options = array()) {
+		$data = array();
+		
 		if (!$alias) {
 			return $model;
 		}
-		if (!empty($options['merge'])) {
+		
+		if (!empty($options['contain'])) {
+			$data = $model[$alias];
+			foreach ($options['contain'] as $key => $value) {
+				$alias = $key;
+				if (is_numeric($key)) {
+					$alias = $value;
+				}
+				if (isset($model[$alias])) {
+					$data[$alias] = $model[$alias];
+				}
+			}
+		} elseif (!empty($options['merge'])) {
 			if (is_string($options['merge'])) {
 				$mergeModel = $options['merge'];
-				return array_merge($model[$alias], $model[$mergeModel]);
+				$data = array_merge($model[$alias], $model[$mergeModel]);
 			}
+		} else {
+			$data = $model[$alias];
 		}
-		return $model[$alias];
+		
+		return $data;
 	}
 	
 	// For backwards compatibility
