@@ -11,11 +11,51 @@ class BackboneHelper extends AppHelper {
 	public $appDir = 'app';
 
 /**
+ * Include backbone.js, underscore.js, json2.js, and mustache.js, or not
+ *
+ * @var string
+ */
+	public $includeCore = false;
+
+/**
+ * Version of backbone to use, should be located in app/webroot/js/backbone/core/<version>/backbone.js
+ *
+ * @var string
+ */
+	public $bbVersion = '0.9.2';
+
+/**
+ * If true then look in the plugin for BB files, otherwise check app
+ *
+ * @var string
+ */
+	public $usePluginFile = true;
+
+/**
+ * Files to include
+ *
+ * @var string
+ */
+	public $include = array('json2', 'underscore', 'backbone', 'mustache');
+	
+/**
  * Helpers to use
  *
  * @var string
  */
 	public $helpers = array('Html', 'Paginator');
+
+/**
+ * Constructor
+ *
+ * @param View $View 
+ * @param string $settings 
+ * @author David Kullmann
+ */
+	public function __construct(View $View, $settings = array()) {
+		$this->_set($settings);
+		return parent::__construct($View, $settings);
+	}
 	
 	public function init($files = array(), $options = array('inline' => false)) {
 		
@@ -23,16 +63,31 @@ class BackboneHelper extends AppHelper {
 			'paging' => $this->Paginator->params()
 		));
 		
-		$backboneCore = array(
-			'backbone/core/json2',
-			'backbone/core/underscore',
-			'backbone/core/mustache',
-			'backbone/core/0.9.2/backbone'
-		);
+		$this->includeCore(false, $options);
 		
-		$this->Html->script($backboneCore, $options);
 		$this->Html->scriptBlock("var viewVars = $viewVarsJson;", $options);
 		return $this->load($files, $options);
+	}
+
+/**
+ * Check to see if we should include the core files
+ *
+ * @param string $force 
+ * @param string $options 
+ * @return void
+ * @author David Kullmann
+ */
+	public function includeCore($force = false, $options = array()) {
+		if ($this->includeCore || $force) {
+			$version = $this->bbVersion;
+			$plugin = $this->usePluginFile ? 'Backbone.' : '';
+			$core = array();
+			foreach ($this->include as $file) {
+				$file = ($file === 'backbone') ? $version . '/backbone' : $file;
+				$core[] = $plugin . 'backbone/core/' . $file;
+			}
+			$this->Html->script($core, $options);
+		}
 	}
 
 /**
