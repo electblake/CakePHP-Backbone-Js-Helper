@@ -45,7 +45,7 @@ class BackboneHelper extends AppHelper {
  */
 	public $plugins = array(
 		'forms' => array(
-			'js' => array('/src/backbone-forms.js'),
+			'js' => array('/distribution/backbone-forms.js'),
 			'css' => array('/src/backbone-forms.css')
 		),
 		'pagination' => array(
