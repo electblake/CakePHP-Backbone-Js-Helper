@@ -1,0 +1,6 @@
+[submodule "webroot/js/backbone/forms"]
+	path = webroot/js/backbone/forms
+	url = https://github.com/powmedia/backbone-forms.git
+[submodule "webroot/js/backbone/pagination"]
+	path = webroot/js/backbone/pagination
+	url = git@github.com:dkullmann/Backbone.PagedCollection.git
