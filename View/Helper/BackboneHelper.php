@@ -11,11 +11,66 @@ class BackboneHelper extends AppHelper {
 	public $appDir = 'app';
 
 /**
+ * Include backbone.js, underscore.js, json2.js, and mustache.js, or not
+ *
+ * @var string
+ */
+	public $includeCore = false;
+
+/**
+ * Version of backbone to use, should be located in app/webroot/js/backbone/core/<version>/backbone.js
+ *
+ * @var string
+ */
+	public $bbVersion = '0.9.2';
+
+/**
+ * If true then look in the plugin for BB files, otherwise check app
+ *
+ * @var string
+ */
+	public $usePluginFile = true;
+
+/**
+ * Files to include
+ *
+ * @var string
+ */
+	public $include = array('json2', 'underscore', 'backbone', 'mustache');
+
+/**
+ * "Plugin" like includes located in webroot/js/backbone/<plugin> to include
+ *
+ * @var string
+ */
+	public $plugins = array(
+		'forms' => array(
+			'js' => array('/distribution/backbone-forms.js'),
+			'css' => array('/src/backbone-forms.css')
+		),
+		'pagination' => array(
+			'js' => array('/backbone.pagedcollection.js')
+		)
+	);
+	
+/**
  * Helpers to use
  *
  * @var string
  */
 	public $helpers = array('Html', 'Paginator');
+
+/**
+ * Constructor
+ *
+ * @param View $View 
+ * @param string $settings 
+ * @author David Kullmann
+ */
+	public function __construct(View $View, $settings = array()) {
+		$this->_set($settings);
+		return parent::__construct($View, $settings);
+	}
 	
 	public function init($files = array(), $options = array('inline' => false)) {
 		
@@ -23,16 +78,65 @@ class BackboneHelper extends AppHelper {
 			'paging' => $this->Paginator->params()
 		));
 		
-		$backboneCore = array(
-			'backbone/core/json2',
-			'backbone/core/underscore',
-			'backbone/core/mustache',
-			'backbone/core/0.9.2/backbone'
-		);
+		$this->includeCore(false, $options);
+		$this->includePlugins($options);
 		
-		$this->Html->script($backboneCore, $options);
 		$this->Html->scriptBlock("var viewVars = $viewVarsJson;", $options);
 		return $this->load($files, $options);
+	}
+
+/**
+ * Check to see if we should include the core files
+ *
+ * @param string $force 
+ * @param string $options 
+ * @return void
+ * @author David Kullmann
+ */
+	public function includeCore($force = false, $options = array()) {
+		if ($this->includeCore || $force) {
+			$version = $this->bbVersion;
+			$plugin = $this->usePluginFile ? 'Backbone.' : '';
+			$core = array();
+			foreach ($this->include as $file) {
+				$file = ($file === 'backbone') ? $version . '/backbone' : $file;
+				$core[] = $plugin . 'backbone/core/' . $file;
+			}
+			$this->Html->script($core, $options);
+		}
+	}
+	
+	public function includePlugins($options = array()) {
+		$jsFiles = array();
+		$cssFiles = array();
+		foreach ($this->plugins as $plugin => $types) {
+			foreach ($types as $type => $files) {
+				foreach ($files as $file) {
+					$file = $this->filePath($file, compact('type', 'plugin'));
+					if ($type === 'js') {
+						$jsFiles[] = $file;
+					} elseif ($type === 'css') {
+						$cssFiles[] = $file;
+					}
+				}
+			}
+		}
+		$this->Html->script($jsFiles, $options);
+		$this->Html->css($cssFiles, null, $options);
+	}
+
+/**
+ * Locate a file
+ *
+ * @author David Kullmann
+ */
+	public function filePath($file, $options) {
+		extract ($options);
+		$path = 'backbone/';
+		$prefix = (isset($type) && $type = 'css') ? '/js/' : '';
+		$pluginPrefix = $this->usePluginFile ? 'Backbone.' : '';
+		$bbPlugin = (isset($plugin)) ? $plugin : ''; 
+		return $pluginPrefix . $prefix . $path . $bbPlugin . $file;
 	}
 
 /**
@@ -76,6 +180,7 @@ class BackboneHelper extends AppHelper {
 			'inline' => true,
 			'alias' => $alias,
 			'merge' => false,
+			'contain' => false
 		);
 		
 		$options = array_merge($defaults, $options);
@@ -120,22 +225,39 @@ class BackboneHelper extends AppHelper {
 	}
 	
 	protected function _extractModel($model = array(), $alias = null, $options = array()) {
+		$data = array();
+		
 		if (!$alias) {
 			return $model;
 		}
-		if (!empty($options['merge'])) {
+		
+		if (!empty($options['contain'])) {
+			$data = $model[$alias];
+			foreach ($options['contain'] as $key => $value) {
+				$alias = $key;
+				if (is_numeric($key)) {
+					$alias = $value;
+				}
+				if (isset($model[$alias])) {
+					$data[$alias] = $model[$alias];
+				}
+			}
+		} elseif (!empty($options['merge'])) {
 			if (is_string($options['merge'])) {
 				$mergeModel = $options['merge'];
-				return array_merge($model[$alias], $model[$mergeModel]);
+				$data = array_merge($model[$alias], $model[$mergeModel]);
 			} elseif (is_array($options['merge'])) {
 				$tmp = array();
 				foreach($options['merge'] as $mergeModel) {
 					$tmp = array_merge($tmp, $model[$mergeModel]);
 				}
-				return array_merge($model[$alias], $tmp);
+				$data = array_merge($model[$alias], $tmp);
 			}
+		} else {
+			$data = $model[$alias];
 		}
-		return $model[$alias];
+		
+		return $data;
 	}
 	
 	// For backwards compatibility
