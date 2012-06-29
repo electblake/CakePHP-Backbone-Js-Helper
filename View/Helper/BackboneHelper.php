@@ -246,6 +246,12 @@ class BackboneHelper extends AppHelper {
 			if (is_string($options['merge'])) {
 				$mergeModel = $options['merge'];
 				$data = array_merge($model[$alias], $model[$mergeModel]);
+			} elseif (is_array($options['merge'])) {
+				$tmp = array();
+				foreach($options['merge'] as $mergeModel) {
+					$tmp = array_merge($tmp, $model[$mergeModel]);
+				}
+				$data = array_merge($model[$alias], $tmp);
 			}
 		} else {
 			$data = $model[$alias];
