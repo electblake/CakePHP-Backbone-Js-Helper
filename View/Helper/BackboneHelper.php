@@ -193,7 +193,11 @@ class BackboneHelper extends AppHelper {
 				
 		$alias = $options['alias'];
 		$varName = $options['varName'];
-
+		if (!empty($options['format'])) {
+  		if ($options['format'] == 'json') {
+    		return $toJson;
+  		}
+		}
 		return $this->Html->scriptBlock("var $varName = $toJson;");
 	}
 
